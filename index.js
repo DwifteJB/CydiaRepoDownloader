@@ -5,17 +5,17 @@ import * as stream from 'stream';
 import * as Bunzip from 'seek-bzip';
 import * as debianCtrl from 'debian-control';
 const streamPipeline = util.promisify(stream.pipeline);
-const headers = {
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
-}
-
+// const headers = {
+//     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+// }
+const headers = {"X-Machine": "iPhone13,4","X-Firmware": "15.0","Proxy-Connection": "keep-alive","Cache-Control": "max-age=0","User-Agent": "Telesphoreo APT-HTTP/1.0.592","X-Unique-ID": "iLikeBlueBabyyy","Connection": "keep-alive"}
 export async function getRepoImage(repoURL) {
     return await fetch(repoURL+"/CydiaIcon.png", {
         headers: headers
     }); 
 }
 export async function downloadPackageFromRepo(repoURL, packageName, downloadLocation) {
-    const repo = await this.downloadRepo(repoURL);
+    const repo = await this.parseRepo(repoURL);
     const repoDownload = JSON.parse(repo);
     for (var pkg in repoDownload.packages) {
         if (repoDownload.packages[pkg].Name.toLowerCase() == packageName.toLowerCase()) {
@@ -36,7 +36,7 @@ export async function downloadPackageFromRepo(repoURL, packageName, downloadLoca
 }
 export async function downloadAllPackagesFromRepo(repoURL, downloadLocation) {
     console.log("Downloading all packages to: " + downloadLocation);
-    const repoDownload = JSON.parse(await this.downloadRepo(repoURL));
+    const repoDownload = JSON.parse(await this.parseRepo(repoURL));
     let errors = []
     for (var pkg in repoDownload.packages) {
         try {

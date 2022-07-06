@@ -2,7 +2,7 @@
   "name": "cydiarepodownloader",
   "type": "module",
   "description": "Simple Cydia downloader for NodeJS",
-  "version": "1.5.1",
+  "version": "1.5.3",
   "main": "index.js",
   "dependencies": {
     "debian-control": "^1.0.0",
@@ -10,7 +10,6 @@
     "seek-bzip": "^2.0.0",
     "stream": "^0.0.2"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
