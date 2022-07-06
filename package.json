@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "debian-control": "^1.0.0",
+    "node-fetch": "^3.2.6",
+    "seek-bzip": "^2.0.0",
+    "stream": "^0.0.2"
+  },
+  "name": "cydiarepodownloader",
+  "type": "module",
+  "description": "Simple Cydia downloader for NodeJS",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DwifteJB/CydiaRepoDownloader.git"
+  },
+  "author": "DwifteJB",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DwifteJB/CydiaRepoDownloader/issues"
+  },
+  "homepage": "https://github.com/DwifteJB/CydiaRepoDownloader#readme"
+}
