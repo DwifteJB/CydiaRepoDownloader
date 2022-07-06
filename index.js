@@ -14,7 +14,52 @@ export async function getRepoImage(repoURL) {
         headers: headers
     }); 
 }
-export async function downloadRepo(repoURL) {
+export async function downloadPackageFromRepo(repoURL, packageName, downloadLocation) {
+    const repo = await this.downloadRepo(repoURL);
+    const repoDownload = JSON.parse(repo);
+    for (var pkg in repoDownload.packages) {
+        if (repoDownload.packages[pkg].Name.toLowerCase() == packageName.toLowerCase()) {
+            // found package!
+            // time to download!
+            try {
+                const response = await fetch(repoDownload.packages[pkg].Filename, {
+                    headers: headers
+                });
+                await streamPipeline(response.body,fs.createWriteStream(downloadLocation));
+                return true;
+            } catch (e) {
+                console.log(e)
+                return false;
+            }
+        }
+    }
+}
+export async function downloadAllPackagesFromRepo(repoURL, downloadLocation) {
+    console.log("Downloading all packages to: " + downloadLocation);
+    const repoDownload = JSON.parse(await this.downloadRepo(repoURL));
+    let errors = []
+    for (var pkg in repoDownload.packages) {
+        try {
+            const response = await fetch(repoDownload.packages[pkg].Filename, {
+                headers: headers
+            });
+            await streamPipeline(response.body,fs.createWriteStream(downloadLocation + `/${repoDownload.packages[pkg].Name}-${repoDownload.packages[pkg].Version}.deb`));
+        } catch(e) {
+            try {
+                const response = await fetch(repoURL + repoDownload.packages[pkg].Filename, {
+                    headers: headers
+                });
+                await streamPipeline(response.body,fs.createWriteStream(downloadLocation + `/${repoDownload.packages[pkg].Name}-${repoDownload.packages[pkg].Version}.deb`));
+            } catch (e) {
+                console.log(e)
+                errors.push(repoDownload.packages[pkg].Name);
+            }
+  
+        }
+    }
+    return errors;
+}
+export async function parseRepo(repoURL) {
     let skip = false;
     const tempDir = fs.mkdtempSync("repoDownloader")
     try {
@@ -50,13 +95,6 @@ export async function downloadRepo(repoURL) {
     } 
     // Now that the BZ2 has been decompressed to pkgs, we need to read those pkgs
     let pkgs = fs.readFileSync(tempDir + "/repo.pkgs").toString();
-    pkgs = pkgs.replace('Filename: ./debs', `Filename: ${repoURL}debs`)
-    pkgs = pkgs.replace('Filename: ./deb', `Filename: ${repoURL}deb`)
-    pkgs = pkgs.replace('Filename: deb', `Filename: ${repoURL}deb`)
-    pkgs = pkgs.replace('Filename: debs', `Filename: ${repoURL}debs`)
-    pkgs = pkgs.replace('Filename: api', `Filename: ${repoURL}api`)
-    pkgs = pkgs.replace('Filename: pool', `Filename: ${repoURL}pool`)
-    pkgs = pkgs.replace('Filename: files', `Filename: ${repoURL}files`)
     pkgs = pkgs.replace('Filename: ./debs', `Filename: ${repoURL}/debs`)
     pkgs = pkgs.replace('Filename: ./deb', `Filename: ${repoURL}/deb`)
     pkgs = pkgs.replace('Filename: deb', `Filename: ${repoURL}/deb`)
@@ -64,6 +102,13 @@ export async function downloadRepo(repoURL) {
     pkgs = pkgs.replace('Filename: api', `Filename: ${repoURL}/api`)
     pkgs = pkgs.replace('Filename: pool', `Filename: ${repoURL}/pool`)
     pkgs = pkgs.replace('Filename: files', `Filename: ${repoURL}/files`)
+    pkgs = pkgs.replace('Filename:./debs', `Filename: ${repoURL}/debs`)
+    pkgs = pkgs.replace('Filename:./deb', `Filename: ${repoURL}/deb`)
+    pkgs = pkgs.replace('Filename:deb', `Filename: ${repoURL}/deb`)
+    pkgs = pkgs.replace('Filename:debs', `Filename: ${repoURL}/debs`)
+    pkgs = pkgs.replace('Filename:api', `Filename: ${repoURL}/api`)
+    pkgs = pkgs.replace('Filename:pool', `Filename: ${repoURL}/pool`)
+    pkgs = pkgs.replace('Filename:files/', `Filename: ${repoURL}/files`)
     pkgs = pkgs.replace('�', ' ');
     let data = {"url": repoURL,"packages": []};
     // Parse that control file.
