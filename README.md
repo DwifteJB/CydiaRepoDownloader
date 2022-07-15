@@ -1,7 +1,6 @@
 # CydiaRepoDownloader
 **Simple Cydia Repo installer and parser for NodeJS**
 
-**Like this? Check out the <a src="https://github.com/DwifteJB/CyDesktop">CyDesktop</a> application being made with this package!**
 ## Usage
 
 ### Parse Repository as JSON
